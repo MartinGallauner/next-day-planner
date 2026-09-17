@@ -1,0 +1,9 @@
+{
+	"id": "next-day-planner",
+	"name": "Next Day Planner",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Open or create tomorrow's daily note using the same folder, format and template as the core Daily notes plugin.",
+	"author": "Martin Gallauner",
+	"isDesktopOnly": false
+}
