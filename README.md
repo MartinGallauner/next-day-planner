@@ -35,6 +35,20 @@ there.
 Configurable in Settings → Next Day Planner: the heading, whether rollover
 happens on open, and whether the counter is shown.
 
+## Installation
+
+Not yet in the community plugin directory. Until then:
+
+**With BRAT (recommended)** — install the
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin, run its
+*Add a beta plugin* command, and paste `MartinGallauner/next-day-planner`.
+BRAT installs the latest release and keeps it updated.
+
+**Manually** — download `main.js` and `manifest.json` from the
+[latest release](https://github.com/MartinGallauner/next-day-planner/releases),
+put them in `<your-vault>/.obsidian/plugins/next-day-planner/`, then enable
+*Next Day Planner* in Settings → Community plugins.
+
 ## How it works
 
 Settings are read from the core Daily notes plugin via
@@ -57,12 +71,21 @@ npm test        # or: mise run test   — vitest, covers the markdown parsing
 To test in a real vault, symlink the repo into its plugin folder:
 
 ```bash
-ln -s "$PWD" ~/Documents/MG-2nd-brain-remote/.obsidian/plugins/next-day-planner
+ln -s "$PWD" <your-vault>/.obsidian/plugins/next-day-planner
 ```
 
 Then enable *Next Day Planner* in Settings → Community plugins. Install the
 [Hot Reload](https://github.com/pjeby/hot-reload) plugin to avoid restarting
 Obsidian on every rebuild.
+
+To release: bump `version` in `manifest.json` (and `versions.json`), commit,
+then tag that version and push the tag. CI builds the plugin, runs the tests,
+and attaches `main.js` + `manifest.json` to a draft GitHub release — review
+and publish it.
+
+```bash
+git tag 0.1.0 && git push origin 0.1.0
+```
 
 ## License
 
