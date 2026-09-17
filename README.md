@@ -44,11 +44,14 @@ twice — change your Daily notes settings and this plugin follows.
 
 ## Development
 
+Node is pinned via [mise](https://mise.jdx.dev/) (`mise.toml`) — `mise install`
+once, then either the npm scripts or the equivalent mise tasks:
+
 ```bash
 npm install
-npm run dev     # esbuild watch -> main.js
-npm run build   # typecheck + minified build
-npm test        # vitest, covers the markdown parsing
+npm run dev     # or: mise run dev    — esbuild watch -> main.js
+npm run build   # or: mise run build  — typecheck + minified build
+npm test        # or: mise run test   — vitest, covers the markdown parsing
 ```
 
 To test in a real vault, symlink the repo into its plugin folder:

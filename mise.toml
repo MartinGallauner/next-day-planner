@@ -1,0 +1,14 @@
+[tools]
+node = "25.8"
+
+[tasks.dev]
+description = "esbuild watch -> main.js"
+run = "npm run dev"
+
+[tasks.build]
+description = "typecheck + minified build"
+run = "npm run build"
+
+[tasks.test]
+description = "vitest, covers the markdown parsing"
+run = "npm test"
