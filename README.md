@@ -8,12 +8,32 @@ later note.) This plugin fills that gap: one command creates or opens the next d
 note using the exact same folder, filename format and template you already configured
 in Daily notes.
 
-## Status
+## Commands
 
-**v0.1.0 — phase 1 only.**
+- **Open tomorrow's daily note** — creates it if needed, rolls today's
+  unfinished tasks in, opens it. Also on the ribbon (calendar icon).
+- **Roll over unfinished tasks into tomorrow's note** — the rollover on its
+  own, without opening anything.
 
-- [x] Command: *Open tomorrow's daily note* (also in the ribbon, calendar icon)
-- [ ] Phase 2: roll over today's unchecked action items into tomorrow's note
+## Rollover
+
+Unchecked tasks under the configured heading (default `✅ Do`) are **copied**
+into the same heading in tomorrow's note, above whatever the template put
+there.
+
+- Today's note is never modified. An unchecked box stays unchecked where it is,
+  so the day remains an honest record of what you didn't do.
+- Only that one heading is read. Your Highlight stays a single Highlight.
+- The source is strictly the day before. Skip a day and nothing rolls over —
+  no digging through history.
+- Each carried task gets a `(↻n)` counter. `(↻4)` means you have moved that
+  task four times, which is information about a decision you are avoiding, not
+  about your workload.
+- Tasks already present in tomorrow's note are never duplicated, so running the
+  command repeatedly is safe.
+
+Configurable in Settings → Next Day Planner: the heading, whether rollover
+happens on open, and whether the counter is shown.
 
 ## How it works
 
@@ -28,6 +48,7 @@ twice — change your Daily notes settings and this plugin follows.
 npm install
 npm run dev     # esbuild watch -> main.js
 npm run build   # typecheck + minified build
+npm test        # vitest, covers the markdown parsing
 ```
 
 To test in a real vault, symlink the repo into its plugin folder:
