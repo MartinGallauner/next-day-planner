@@ -116,7 +116,10 @@ export function extractUncheckedTasks(
 			continue;
 		}
 
-		tasks.push({ text, count, children: collectChildren(lines, i, indent) });
+		const children = collectChildren(lines, i, indent);
+		tasks.push({ text, count, children });
+		// Children travel with their parent; don't visit them as tasks again.
+		i += children.length;
 	}
 
 	return tasks;

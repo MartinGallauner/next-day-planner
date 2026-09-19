@@ -86,6 +86,19 @@ describe("extractUncheckedTasks", () => {
 		const [parent] = extractUncheckedTasks(lines, HEADING);
 		expect(parent.children).toEqual(["\t- [ ] child"]);
 	});
+
+	it("does not extract a nested task a second time on its own", () => {
+		const lines = [
+			"# ✅ Do",
+			"- [ ] parent",
+			"\t- [ ] child",
+			"\t\t- [ ] grandchild",
+			"- [ ] other",
+		];
+		expect(
+			extractUncheckedTasks(lines, HEADING).map((task) => task.text)
+		).toEqual(["parent", "other"]);
+	});
 });
 
 describe("renderTask", () => {
@@ -146,6 +159,21 @@ describe("insertTasks", () => {
 		const { added, lines } = insertTasks(target, HEADING, tasks, true);
 		expect(added).toBe(1);
 		expect(lines.join("\n")).not.toContain("- [ ] [[Russisch]]");
+	});
+
+	it("rolls a nested task over exactly once", () => {
+		const source = ["# ✅ Do", "- [ ] parent", "\t- [ ] child"];
+		const nested = extractUncheckedTasks(source, HEADING);
+		const { lines, added } = insertTasks(
+			template.split("\n"),
+			HEADING,
+			nested,
+			false
+		);
+		expect(added).toBe(1);
+		expect(lines.filter((line) => line.includes("child"))).toEqual([
+			"\t- [ ] child",
+		]);
 	});
 
 	it("reports nothing added when the heading is missing", () => {
