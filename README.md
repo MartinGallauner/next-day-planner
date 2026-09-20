@@ -17,13 +17,18 @@ in Daily notes.
 
 ## Rollover
 
-Unchecked tasks under the configured heading (default `✅ Do`) are **copied**
-into the same heading in tomorrow's note, above whatever the template put
-there.
+Unchecked tasks from today's note are **copied** into tomorrow's note. By
+default every unchecked task is carried over and inserted at the top of
+tomorrow's note, right below its frontmatter.
+
+Set a heading (e.g. `✅ Do`) to narrow that down: only unchecked tasks under
+that heading are copied, into the same heading in tomorrow's note, above
+whatever the template put there.
 
 - Today's note is never modified. An unchecked box stays unchecked where it is,
   so the day remains an honest record of what you didn't do.
-- Only that one heading is read. Your Highlight stays a single Highlight.
+- With a heading set, only that heading is read. Your Highlight stays a
+  single Highlight.
 - The source is strictly the day before. Skip a day and nothing rolls over —
   no digging through history.
 - Each carried task gets a `(↻n)` counter. `(↻4)` means you have moved that
@@ -32,8 +37,12 @@ there.
 - Tasks already present in tomorrow's note are never duplicated, so running the
   command repeatedly is safe.
 
-Configurable in Settings → Next Day Planner: the heading, whether rollover
-happens on open, and whether the counter is shown.
+Configurable in Settings → Next Day Planner: the heading (empty for the whole
+note), whether rollover happens on open, and whether the counter is shown.
+
+Requires the core **Daily notes** plugin (or Periodic Notes with daily notes
+enabled). While it is off, the commands only show a notice and the settings
+tab shows a warning.
 
 ## Installation
 

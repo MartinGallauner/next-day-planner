@@ -181,3 +181,46 @@ describe("insertTasks", () => {
 		expect(insertTasks(target, HEADING, tasks, true).added).toBe(0);
 	});
 });
+
+describe("whole note (empty heading)", () => {
+	const source = [
+		"---",
+		"tags:",
+		"  - daily",
+		"---",
+		"# ✨Today's Highlight",
+		"- [ ] [[RIAG IT Welcome Day]]",
+		"",
+		"# ✅ Do",
+		"- [ ] [[Russisch]] Kurs anmelden",
+		"- [x] done",
+		"- [ ] ",
+	];
+
+	it("extracts unchecked tasks from every section", () => {
+		expect(
+			extractUncheckedTasks(source, "").map((task) => task.text)
+		).toEqual(["[[RIAG IT Welcome Day]]", "[[Russisch]] Kurs anmelden"]);
+	});
+
+	it("inserts below the frontmatter and stays idempotent", () => {
+		const tasks = extractUncheckedTasks(source, "");
+		const once = insertTasks(template.split("\n"), "", tasks, false);
+		expect(once.added).toBe(2);
+		expect(once.lines.slice(4, 8)).toEqual([
+			"---",
+			"- [ ] [[RIAG IT Welcome Day]]",
+			"- [ ] [[Russisch]] Kurs anmelden",
+			"# ✨Today's Highlight",
+		]);
+		expect(insertTasks(once.lines, "", tasks, false).added).toBe(0);
+	});
+
+	it("inserts at the top of a note without frontmatter", () => {
+		const tasks = [{ text: "a", count: 0, children: [] }];
+		expect(insertTasks(["# Day"], "", tasks, false).lines).toEqual([
+			"- [ ] a",
+			"# Day",
+		]);
+	});
+});

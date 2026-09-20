@@ -1,8 +1,12 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
+import { appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
 import type NextDayPlannerPlugin from "./main";
 
 export interface NextDayPlannerSettings {
-	/** Heading whose unchecked tasks are rolled over, in both notes. */
+	/**
+	 * Heading whose unchecked tasks are rolled over, in both notes. Empty rolls
+	 * over every unchecked task in the note.
+	 */
 	taskHeading: string;
 	/** Roll tasks over automatically when opening tomorrow's note. */
 	rollOverOnOpen: boolean;
@@ -11,7 +15,7 @@ export interface NextDayPlannerSettings {
 }
 
 export const DEFAULT_SETTINGS: NextDayPlannerSettings = {
-	taskHeading: "✅ Do",
+	taskHeading: "",
 	rollOverOnOpen: true,
 	showRolloverCounter: true,
 };
@@ -25,18 +29,24 @@ export class NextDayPlannerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
+		if (!appHasDailyNotesPluginLoaded()) {
+			containerEl.createEl("p", {
+				cls: "mod-warning",
+				text: "The core Daily notes plugin is turned off, so this plugin does nothing until you enable it in Settings → Core plugins. Its folder, date format and template are used for tomorrow's note.",
+			});
+		}
+
 		new Setting(containerEl)
-			.setName("Task heading")
+			.setName("Roll over tasks under heading")
 			.setDesc(
-				"Unchecked tasks under this heading are carried into tomorrow's note, under the same heading. Leave out the leading #."
+				"Only unchecked tasks below this heading are carried over, and they land below the same heading in tomorrow's note. Enter the heading text without the #, e.g. ✅ Do. Leave empty to carry over every unchecked task in the note."
 			)
 			.addText((text) =>
 				text
-					.setPlaceholder(DEFAULT_SETTINGS.taskHeading)
+					.setPlaceholder("Whole note")
 					.setValue(this.plugin.settings.taskHeading)
 					.onChange(async (value) => {
-						this.plugin.settings.taskHeading =
-							value.trim() || DEFAULT_SETTINGS.taskHeading;
+						this.plugin.settings.taskHeading = value.trim();
 						await this.plugin.saveSettings();
 					})
 			);

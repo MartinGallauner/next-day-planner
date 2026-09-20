@@ -8,7 +8,7 @@ const TASK_RE = /^(\s*)([-*+])\s+\[(.)\]\s*(.*)$/;
 const COUNTER_RE = /\s*\(↻(\d+)\)\s*$/;
 
 export interface Section {
-	/** Index of the heading line itself. */
+	/** Index of the heading line itself, -1 when the section is the whole note. */
 	heading: number;
 	/** First line of the section body. */
 	start: number;
@@ -29,9 +29,27 @@ function normalizeHeading(text: string): string {
 	return text.replace(/^#+\s*/, "").trim();
 }
 
-/** Locates a section by heading text. Matching ignores leading `#` and case. */
+/** The note body below any frontmatter. */
+function wholeNote(lines: string[]): Section {
+	let start = 0;
+	if (lines[0]?.trim() === "---") {
+		const close = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
+		if (close !== -1) {
+			start = close + 1;
+		}
+	}
+	return { heading: -1, start, end: lines.length };
+}
+
+/**
+ * Locates a section by heading text. Matching ignores leading `#` and case.
+ * An empty heading selects the whole note.
+ */
 export function findSection(lines: string[], heading: string): Section | null {
 	const wanted = normalizeHeading(heading).toLowerCase();
+	if (wanted === "") {
+		return wholeNote(lines);
+	}
 
 	for (let i = 0; i < lines.length; i++) {
 		const match = HEADING_RE.exec(lines[i]);
@@ -163,8 +181,8 @@ export interface InsertResult {
 }
 
 /**
- * Inserts tasks at the top of `heading`, leaving any template placeholder in
- * place below them. Tasks already present are skipped, so repeated runs are
+ * Inserts tasks at the top of `heading` (or of the note body when `heading` is
+ * empty), leaving any template placeholder in place below them. Tasks already present are skipped, so repeated runs are
  * idempotent.
  */
 export function insertTasks(
