@@ -1,9 +1,10 @@
-import { Notice, Plugin, TFile, moment } from "obsidian";
+import { Notice, Plugin, TFile, TFolder, moment, normalizePath } from "obsidian";
 import {
 	appHasDailyNotesPluginLoaded,
-	createDailyNote,
 	getAllDailyNotes,
 	getDailyNote,
+	getDailyNoteSettings,
+	getTemplateInfo,
 } from "obsidian-daily-notes-interface";
 import {
 	DEFAULT_SETTINGS,
@@ -11,8 +12,21 @@ import {
 	NextDayPlannerSettings,
 } from "./settings";
 import { extractUncheckedTasks, findSection, insertTasks } from "./rollover";
+import { applyTemplate } from "./template";
 
 type Moment = ReturnType<typeof moment>;
+
+/** The parts of the app Obsidian does not declare publicly. */
+interface InternalApp {
+	internalPlugins?: {
+		getPluginById(id: string): { instance?: { options?: unknown } } | null;
+	};
+	foldManager?: { save(file: TFile, folds: unknown): void };
+}
+
+const DEFAULT_NOTE_FORMAT = "YYYY-MM-DD";
+const DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
+const DEFAULT_TIME_FORMAT = "HH:mm";
 
 export default class NextDayPlannerPlugin extends Plugin {
 	settings: NextDayPlannerSettings = DEFAULT_SETTINGS;
@@ -92,11 +106,78 @@ export default class NextDayPlannerPlugin extends Plugin {
 		}
 
 		try {
-			return (await createDailyNote(date)) ?? null;
+			return await this.createDailyNote(date);
 		} catch (error) {
 			console.error("Next Day Planner: failed to create note", error);
 			new Notice("Next Day Planner: could not create tomorrow's note.");
 			return null;
+		}
+	}
+
+	/**
+	 * Creates the daily note for `date` from the core Daily notes template.
+	 *
+	 * This is deliberately not `createDailyNote()` from the daily notes
+	 * interface: that helper expands a bare `{{date}}` and `{{title}}` using
+	 * the daily note *filename* format, so a format carrying folders such as
+	 * `YYYY/MM-MMMM/YYYY-MM-DD-dddd` lands a path in the note. The core plugin
+	 * uses the Templates plugin's date format instead, and so do we.
+	 */
+	private async createDailyNote(date: Moment): Promise<TFile | null> {
+		const { format, folder, template } = getDailyNoteSettings() ?? {};
+		const noteFormat = format || DEFAULT_NOTE_FORMAT;
+		const filename = date.format(noteFormat);
+		const path = normalizePath(`${folder ?? ""}/${filename}.md`);
+
+		await this.ensureParentFolder(path);
+
+		const [contents, folds] = await getTemplateInfo(template ?? "");
+		const { dateFormat, timeFormat } = this.templateFormats();
+		const file = await this.app.vault.create(
+			path,
+			applyTemplate(contents, {
+				title: filename.slice(filename.lastIndexOf("/") + 1),
+				date,
+				now: moment(),
+				dateFormat,
+				timeFormat,
+				noteFormat,
+			})
+		);
+
+		// Carry the template's folded sections across, as the core plugin does.
+		(this.app as unknown as InternalApp).foldManager?.save(file, folds);
+		return file;
+	}
+
+	/** Date and time formats configured in the core Templates plugin. */
+	private templateFormats(): { dateFormat: string; timeFormat: string } {
+		const options = (this.app as unknown as InternalApp).internalPlugins
+			?.getPluginById("templates")
+			?.instance?.options as
+			| { dateFormat?: string; timeFormat?: string }
+			| undefined;
+
+		return {
+			dateFormat: options?.dateFormat || DEFAULT_DATE_FORMAT,
+			timeFormat: options?.timeFormat || DEFAULT_TIME_FORMAT,
+		};
+	}
+
+	/**
+	 * Creates the folders `path` lives in, if they are not there yet. Every
+	 * ancestor is created in turn, because a filename format such as
+	 * `YYYY/MM-MMMM/YYYY-MM-DD` nests the note several folders deep.
+	 */
+	private async ensureParentFolder(path: string): Promise<void> {
+		const segments = path.split("/").slice(0, -1);
+
+		for (let i = 0; i < segments.length; i++) {
+			const folder = segments.slice(0, i + 1).join("/");
+			if (this.app.vault.getAbstractFileByPath(folder) instanceof TFolder) {
+				continue;
+			}
+			await this.app.vault.createFolder(folder);
 		}
 	}
 

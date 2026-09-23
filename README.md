@@ -65,6 +65,14 @@ Settings are read from the core Daily notes plugin via
 the same library the Calendar and Periodic Notes plugins use. Nothing is configured
 twice — change your Daily notes settings and this plugin follows.
 
+Template placeholders are expanded the way the core plugin expands them:
+`{{title}}` is the note's filename, `{{date}}` and `{{time}}` use the formats
+from the core **Templates** plugin, and `{{date:FORMAT}}` takes any moment
+format. That matters if your filename format carries folders, e.g.
+`YYYY/MM-MMMM/YYYY-MM-DD-dddd` — a bare `{{date}}` still gives you `2026-09-24`,
+not the whole path. `{{yesterday}}` and `{{tomorrow}}` use the filename format,
+so they link to the neighbouring notes.
+
 ## Development
 
 Node is pinned via [mise](https://mise.jdx.dev/) (`mise.toml`) — `mise install`
