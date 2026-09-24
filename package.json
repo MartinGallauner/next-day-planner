@@ -1,6 +1,6 @@
 {
 	"name": "next-day-planner",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Obsidian plugin to open or create tomorrow's daily note.",
 	"main": "main.js",
 	"private": true,
