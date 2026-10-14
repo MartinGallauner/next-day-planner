@@ -41,9 +41,9 @@ describe("applyTemplate", () => {
 	});
 
 	it("honours an explicit format suffix", () => {
-		expect(applyTemplate("{{date:dddd}} {{time:HH.mm.ss}}", context())).toBe(
-			"Thursday 21.07.30"
-		);
+		expect(
+			applyTemplate("{{date:dddd}} {{time:HH.mm.ss}}", context())
+		).toBe("Thursday 21.07.30");
 	});
 
 	it("applies date offsets", () => {
@@ -54,7 +54,9 @@ describe("applyTemplate", () => {
 	});
 
 	it("links neighbouring days with the filename format", () => {
-		expect(applyTemplate("[[{{yesterday}}]] [[{{tomorrow}}]]", context())).toBe(
+		expect(
+			applyTemplate("[[{{yesterday}}]] [[{{tomorrow}}]]", context())
+		).toBe(
 			"[[2026/09-September/2026-09-23-Wednesday]] " +
 				"[[2026/09-September/2026-09-25-Friday]]"
 		);

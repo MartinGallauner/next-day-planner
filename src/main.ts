@@ -1,4 +1,11 @@
-import { Notice, Plugin, TFile, TFolder, moment, normalizePath } from "obsidian";
+import {
+	Notice,
+	Plugin,
+	TFile,
+	TFolder,
+	moment,
+	normalizePath,
+} from "obsidian";
 import {
 	appHasDailyNotesPluginLoaded,
 	getAllDailyNotes,
@@ -152,11 +159,10 @@ export default class NextDayPlannerPlugin extends Plugin {
 
 	/** Date and time formats configured in the core Templates plugin. */
 	private templateFormats(): { dateFormat: string; timeFormat: string } {
-		const options = (this.app as unknown as InternalApp).internalPlugins
-			?.getPluginById("templates")
-			?.instance?.options as
-			| { dateFormat?: string; timeFormat?: string }
-			| undefined;
+		const options = (
+			this.app as unknown as InternalApp
+		).internalPlugins?.getPluginById("templates")?.instance?.options as
+			{ dateFormat?: string; timeFormat?: string } | undefined;
 
 		return {
 			dateFormat: options?.dateFormat || DEFAULT_DATE_FORMAT,
@@ -174,7 +180,9 @@ export default class NextDayPlannerPlugin extends Plugin {
 
 		for (let i = 0; i < segments.length; i++) {
 			const folder = segments.slice(0, i + 1).join("/");
-			if (this.app.vault.getAbstractFileByPath(folder) instanceof TFolder) {
+			if (
+				this.app.vault.getAbstractFileByPath(folder) instanceof TFolder
+			) {
 				continue;
 			}
 			await this.app.vault.createFolder(folder);
@@ -204,7 +212,9 @@ export default class NextDayPlannerPlugin extends Plugin {
 		}
 
 		const heading = this.settings.taskHeading;
-		const sourceLines = (await this.app.vault.cachedRead(source)).split("\n");
+		const sourceLines = (await this.app.vault.cachedRead(source)).split(
+			"\n"
+		);
 		const tasks = extractUncheckedTasks(sourceLines, heading);
 		if (tasks.length === 0) {
 			return;

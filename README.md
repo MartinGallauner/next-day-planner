@@ -128,6 +128,7 @@ npm install
 npm run dev     # or: mise run dev    — esbuild watch -> main.js
 npm run build   # or: mise run build  — typecheck + minified build
 npm test        # or: mise run test   — vitest, covers the markdown parsing
+npm run format  # or: mise run format — prettier, tabs as in .editorconfig
 ```
 
 To test in a real vault, symlink the repo into its plugin folder and enable the

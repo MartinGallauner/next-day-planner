@@ -12,3 +12,7 @@ run = "npm run build"
 [tasks.test]
 description = "vitest, covers the markdown parsing"
 run = "npm test"
+
+[tasks.format]
+description = "prettier, tabs as in .editorconfig"
+run = "npm run format"

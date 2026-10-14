@@ -6,6 +6,11 @@ All notable changes to Next Day Planner are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Code is formatted with Prettier (`npm run format`), using the tabs the
+  `.editorconfig` already asked for. The release workflow checks it.
+
 ### Fixed
 
 - Finished subtasks no longer roll over with their unfinished parent. Only open

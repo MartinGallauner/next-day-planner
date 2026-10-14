@@ -21,7 +21,10 @@ export const DEFAULT_SETTINGS: NextDayPlannerSettings = {
 };
 
 export class NextDayPlannerSettingTab extends PluginSettingTab {
-	constructor(app: App, private plugin: NextDayPlannerPlugin) {
+	constructor(
+		app: App,
+		private plugin: NextDayPlannerPlugin
+	) {
 		super(app, plugin);
 	}
 
