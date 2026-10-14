@@ -45,9 +45,9 @@ calendar icon in the left ribbon. That is the whole workflow:
 3. Tomorrow's note opens.
 
 
-### What rollover does, precisely
+### What is a rollover?
 
-- Tasks are **copied, never moved**. Today's note is not touched. An unchecked
+- Tasks are **copied**. Today's note is not touched. An unchecked
   box stays unchecked where it is, so each day remains an honest record.
 - Only the note of the day before is read. Skip a day and nothing rolls over.
 - Each carried task gets a `(↻n)` counter. `(↻4)` means you have deferred that
