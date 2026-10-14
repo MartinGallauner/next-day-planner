@@ -33,7 +33,9 @@ function normalizeHeading(text: string): string {
 function wholeNote(lines: string[]): Section {
 	let start = 0;
 	if (lines[0]?.trim() === "---") {
-		const close = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
+		const close = lines.findIndex(
+			(line, i) => i > 0 && line.trim() === "---"
+		);
 		if (close !== -1) {
 			start = close + 1;
 		}
@@ -84,27 +86,52 @@ function splitCounter(text: string): { text: string; count: number } {
 	};
 }
 
-/** Collects the indented lines that belong to the task starting at `index`. */
+interface Children {
+	/** Child lines worth carrying over: everything except finished subtasks. */
+	kept: string[];
+	/** Number of lines below the task that belong to it, kept or not. */
+	consumed: number;
+}
+
+/**
+ * Collects the indented lines that belong to the task starting at `index`.
+ * Checked subtasks are left behind together with anything nested under them;
+ * unchecked subtasks and plain note lines travel with the parent.
+ */
 function collectChildren(
 	lines: string[],
 	index: number,
 	indent: string
-): string[] {
-	const children: string[] = [];
+): Children {
+	const kept: string[] = [];
+	let consumed = 0;
+	let skipDeeperThan: number | null = null;
 
 	for (let i = index + 1; i < lines.length; i++) {
 		const line = lines[i];
 		if (line.trim() === "") {
 			break;
 		}
-		const childIndent = /^\s*/.exec(line)?.[0] ?? "";
-		if (childIndent.length <= indent.length) {
+		const childIndent = (/^\s*/.exec(line)?.[0] ?? "").length;
+		if (childIndent <= indent.length) {
 			break;
 		}
-		children.push(line);
+		consumed++;
+
+		if (skipDeeperThan !== null && childIndent > skipDeeperThan) {
+			continue;
+		}
+		skipDeeperThan = null;
+
+		const task = TASK_RE.exec(line);
+		if (task && task[3] !== " ") {
+			skipDeeperThan = childIndent;
+			continue;
+		}
+		kept.push(line);
 	}
 
-	return children;
+	return { kept, consumed };
 }
 
 /**
@@ -135,9 +162,9 @@ export function extractUncheckedTasks(
 		}
 
 		const children = collectChildren(lines, i, indent);
-		tasks.push({ text, count, children });
+		tasks.push({ text, count, children: children.kept });
 		// Children travel with their parent; don't visit them as tasks again.
-		i += children.length;
+		i += children.consumed;
 	}
 
 	return tasks;

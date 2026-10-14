@@ -82,7 +82,12 @@ describe("extractUncheckedTasks", () => {
 	});
 
 	it("carries indented child lines along with their task", () => {
-		const lines = ["# ✅ Do", "- [ ] parent", "\t- [ ] child", "- [ ] other"];
+		const lines = [
+			"# ✅ Do",
+			"- [ ] parent",
+			"\t- [ ] child",
+			"- [ ] other",
+		];
 		const [parent] = extractUncheckedTasks(lines, HEADING);
 		expect(parent.children).toEqual(["\t- [ ] child"]);
 	});
@@ -99,25 +104,73 @@ describe("extractUncheckedTasks", () => {
 			extractUncheckedTasks(lines, HEADING).map((task) => task.text)
 		).toEqual(["parent", "other"]);
 	});
+
+	it("leaves finished subtasks behind", () => {
+		const lines = [
+			"# ✅ Do",
+			"- [ ] parent",
+			"\t- [x] done",
+			"\t- [ ] open",
+			"\t- [x] also done",
+			"- [ ] other",
+		];
+		const [parent] = extractUncheckedTasks(lines, HEADING);
+		expect(parent.children).toEqual(["\t- [ ] open"]);
+	});
+
+	it("leaves a finished sub-subtask behind under an open subtask", () => {
+		const lines = [
+			"# ✅ Do",
+			"- [ ] parent",
+			"\t- [ ] child",
+			"\t\t- [ ] open grandchild",
+			"\t\t- [x] done grandchild",
+			"- [ ] other",
+		];
+		const [parent] = extractUncheckedTasks(lines, HEADING);
+		expect(parent.children).toEqual([
+			"\t- [ ] child",
+			"\t\t- [ ] open grandchild",
+		]);
+	});
+
+	it("drops everything nested under a finished subtask", () => {
+		const lines = [
+			"# ✅ Do",
+			"- [ ] parent",
+			"\t- [x] done",
+			"\t\t- [ ] orphaned grandchild",
+			"\t\tnote under done",
+			"\t- [ ] open",
+			"\t\tnote under open",
+			"- [ ] other",
+		];
+		const tasks = extractUncheckedTasks(lines, HEADING);
+		expect(tasks.map((task) => task.text)).toEqual(["parent", "other"]);
+		expect(tasks[0].children).toEqual([
+			"\t- [ ] open",
+			"\t\tnote under open",
+		]);
+	});
 });
 
 describe("renderTask", () => {
 	it("increments the counter", () => {
-		expect(renderTask({ text: "a", count: 3, children: [] }, true)).toEqual([
-			"- [ ] a (↻4)",
-		]);
+		expect(renderTask({ text: "a", count: 3, children: [] }, true)).toEqual(
+			["- [ ] a (↻4)"]
+		);
 	});
 
 	it("starts an unmarked task at one", () => {
-		expect(renderTask({ text: "a", count: 0, children: [] }, true)).toEqual([
-			"- [ ] a (↻1)",
-		]);
+		expect(renderTask({ text: "a", count: 0, children: [] }, true)).toEqual(
+			["- [ ] a (↻1)"]
+		);
 	});
 
 	it("omits the counter when disabled", () => {
-		expect(renderTask({ text: "a", count: 3, children: [] }, false)).toEqual([
-			"- [ ] a",
-		]);
+		expect(
+			renderTask({ text: "a", count: 3, children: [] }, false)
+		).toEqual(["- [ ] a"]);
 	});
 });
 
@@ -143,7 +196,12 @@ describe("insertTasks", () => {
 	});
 
 	it("leaves the other sections untouched", () => {
-		const { lines } = insertTasks(template.split("\n"), HEADING, tasks, true);
+		const { lines } = insertTasks(
+			template.split("\n"),
+			HEADING,
+			tasks,
+			true
+		);
 		expect(lines.join("\n")).toContain("# ✨Today's Highlight\n- [ ] \n");
 	});
 
