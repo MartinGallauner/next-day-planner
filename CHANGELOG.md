@@ -4,12 +4,7 @@ All notable changes to Next Day Planner are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-
-- Code is formatted with Prettier (`npm run format`), using the tabs the
-  `.editorconfig` already asked for. The release workflow checks it.
+## [0.2.1] - 2026-10-14
 
 ### Fixed
 
@@ -63,5 +58,6 @@ Initial release.
 - Settings for the rollover heading, whether rollover happens on open, and
   whether the counter is shown.
 
+[0.2.1]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.2.1
 [0.2.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.2.0
 [0.1.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.1.0
