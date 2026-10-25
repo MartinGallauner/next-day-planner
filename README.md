@@ -1,11 +1,11 @@
 # Next Day Planner
 
-Plan tomorrow, today. 
-Every since I started using Obsidian and it's Daily Notes core plugin, I was missing the option 
-to plan ahead. I don't want to put together my goals for to day during an already busy morning.
-I want to do that the evening before.
+Plan tomorrow, today.
 
-
+This plugin is scratching my own itch!
+If you're using the daily-note core plugin to write your daily to-do list, it might be a good match for you too.
+The idea is that you can get all your unchecked todos rolled to today.
+Or if you're like me, and you enjoy planning your next day the night before, you can rollover to tomorrow.
 
 ## Requirements
 
@@ -40,8 +40,8 @@ calendar icon in the left ribbon. That is the whole workflow:
 
 1. If tomorrow's note does not exist, it is created from your Daily notes
    template, in your Daily notes folder, with your filename format.
-2. Every unchecked task in today's note is copied to the top of tomorrow's
-   note.
+2. Every unchecked task in the most recent earlier daily note is copied to the
+   top of tomorrow's note.
 3. Tomorrow's note opens.
 
 
@@ -61,8 +61,7 @@ calendar icon in the left ribbon. That is the whole workflow:
 
 Settings → Next Day Planner:
 
-- **Roll over tasks under heading** — empty by default, which means the whole
-  note. Enter a heading such as `✅ Do` (without the `#`) and only unchecked
+- **Task heading** — empty by default, which means the whole note. Enter a heading such as `✅ Do` (without the `#`) and only unchecked
   tasks under that heading are carried over, into the same heading in
   tomorrow's note, above whatever your template put there. If tomorrow's note
   has no such heading, nothing is inserted and a notice tells you so.
@@ -75,8 +74,8 @@ Settings → Next Day Planner:
 
 - "Tomorrow" is the calendar day after now. Plan at 00:30 and you get the day
   after next.
-- With no heading set, rolled tasks land directly below the frontmatter, above
-  the first heading of your template.
+- With no task heading set, rolled tasks land directly below the frontmatter,
+  above the first heading of your template.
 - Only Markdown checkboxes (`- [ ]`, `* [ ]`, `+ [ ]`) are recognised as
   tasks.
 
