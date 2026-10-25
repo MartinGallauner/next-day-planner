@@ -4,8 +4,8 @@ Plan tomorrow, today.
 
 This plugin is scratching my own itch!
 If you're using the daily-note core plugin to write your daily to-do list, it might be a good match for you too.
-The idea is that you can get all your unchecked todos rolled to today.
-Or if you're like me, and you enjoy planning your next day the night before, you can rollover to tomorrow.
+The idea is that you can rollover all your unchecked todos to tomorrow with the click of a button.
+For context: I enjoy planning my next day the night before.
 
 ## Requirements
 
