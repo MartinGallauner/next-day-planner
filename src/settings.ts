@@ -40,21 +40,6 @@ export class NextDayPlannerSettingTab extends PluginSettingTab {
 		}
 
 		new Setting(containerEl)
-			.setName("Roll over tasks under heading")
-			.setDesc(
-				"Only unchecked tasks below this heading are carried over, and they land below the same heading in tomorrow's note. Enter the heading text without the #, e.g. ✅ Do. Leave empty to carry over every unchecked task in the note."
-			)
-			.addText((text) =>
-				text
-					.setPlaceholder("Whole note")
-					.setValue(this.plugin.settings.taskHeading)
-					.onChange(async (value) => {
-						this.plugin.settings.taskHeading = value.trim();
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
 			.setName("Roll over when opening tomorrow")
 			.setDesc(
 				"Carry unfinished tasks across as part of opening tomorrow's note. Tasks already there are never duplicated."
@@ -78,6 +63,21 @@ export class NextDayPlannerSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.showRolloverCounter)
 					.onChange(async (value) => {
 						this.plugin.settings.showRolloverCounter = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Task heading")
+			.setDesc(
+				"Only roll over unchecked tasks under this heading, and put them under the same heading in tomorrow's note. Type the heading without the #, for example Tasks. Leave empty to use the whole note."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("Whole note")
+					.setValue(this.plugin.settings.taskHeading)
+					.onChange(async (value) => {
+						this.plugin.settings.taskHeading = value.trim();
 						await this.plugin.saveSettings();
 					})
 			);
