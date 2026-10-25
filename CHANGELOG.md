@@ -4,6 +4,15 @@ All notable changes to Next Day Planner are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-10-25
+
+### Changed
+
+- Rollover now reads the most recent daily note before tomorrow instead of
+  strictly the day before, so skipping a day no longer drops your open tasks.
+- The heading setting is now called **Task heading** and sits at the bottom of
+  the settings tab.
+
 ## [0.2.1] - 2026-10-14
 
 ### Fixed

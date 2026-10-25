@@ -11,6 +11,7 @@ import {
 	getAllDailyNotes,
 	getDailyNote,
 	getDailyNoteSettings,
+	getDateFromFile,
 	getTemplateInfo,
 } from "obsidian-daily-notes-interface";
 import {
@@ -201,12 +202,38 @@ export default class NextDayPlannerPlugin extends Plugin {
 	}
 
 	/**
-	 * Copies unchecked tasks from the note of the day before `date` into
-	 * `target`. The source note is never modified, and a missing source note
-	 * means nothing is rolled over.
+	 * Returns the most recent daily note dated before `date`, so a skipped
+	 * day still rolls over from the last note that exists.
+	 */
+	private findPreviousDailyNote(date: Moment): TFile | null {
+		let notes: TFile[];
+		try {
+			notes = Object.values(getAllDailyNotes());
+		} catch (error) {
+			console.debug("Next Day Planner: no daily notes found", error);
+			return null;
+		}
+
+		let latest: { file: TFile; date: Moment } | null = null;
+		for (const file of notes) {
+			const noteDate = getDateFromFile(file, "day");
+			if (
+				noteDate?.isBefore(date, "day") &&
+				(!latest || noteDate.isAfter(latest.date, "day"))
+			) {
+				latest = { file, date: noteDate };
+			}
+		}
+		return latest?.file ?? null;
+	}
+
+	/**
+	 * Copies unchecked tasks from the last daily note before `date` into
+	 * `target`. The source note is never modified, and no earlier note means
+	 * nothing is rolled over.
 	 */
 	private async rollOverInto(target: TFile, date: Moment): Promise<void> {
-		const source = this.findDailyNote(date.clone().subtract(1, "day"));
+		const source = this.findPreviousDailyNote(date);
 		if (!source || source.path === target.path) {
 			return;
 		}
