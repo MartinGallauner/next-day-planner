@@ -44,6 +44,9 @@ calendar icon in the left ribbon. That is the whole workflow:
    top of tomorrow's note.
 3. Tomorrow's note opens.
 
+Forgot to plan last night? Run **Roll over unfinished tasks into today's note**.
+It does the same rollover into today's note, creating it if needed, without
+opening anything.
 
 ### What is a rollover?
 

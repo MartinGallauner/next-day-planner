@@ -4,6 +4,18 @@ All notable changes to Next Day Planner are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Roll over unfinished tasks into today's note** command, for days you did not
+  plan the night before.
+
+### Changed
+
+- The roll-over commands now show a notice when there is nothing new to roll
+  over, instead of doing nothing visibly.
+
 ## [0.3.0] - 2026-10-25
 
 ### Changed

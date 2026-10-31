@@ -23,6 +23,7 @@ import { extractUncheckedTasks, findSection, insertTasks } from "./rollover";
 import { applyTemplate } from "./template";
 
 type Moment = ReturnType<typeof moment>;
+type PlannedDay = "today" | "tomorrow";
 
 /** The parts of the app Obsidian does not declare publicly. */
 interface InternalApp {
@@ -45,17 +46,25 @@ export default class NextDayPlannerPlugin extends Plugin {
 		this.addCommand({
 			id: "open-next-day-note",
 			name: "Open tomorrow's daily note",
-			callback: () => void this.planNextDay({ open: true }),
+			callback: () => void this.planDay("tomorrow", { open: true }),
 		});
 
 		this.addCommand({
 			id: "roll-over-tasks",
 			name: "Roll over unfinished tasks into tomorrow's note",
-			callback: () => void this.planNextDay({ open: false, force: true }),
+			callback: () =>
+				void this.planDay("tomorrow", { open: false, force: true }),
+		});
+
+		this.addCommand({
+			id: "roll-over-tasks-today",
+			name: "Roll over unfinished tasks into today's note",
+			callback: () =>
+				void this.planDay("today", { open: false, force: true }),
 		});
 
 		this.addRibbonIcon("calendar-plus", "Plan tomorrow", () => {
-			void this.planNextDay({ open: true });
+			void this.planDay("tomorrow", { open: true });
 		});
 
 		this.addSettingTab(new NextDayPlannerSettingTab(this.app, this));
@@ -74,13 +83,13 @@ export default class NextDayPlannerPlugin extends Plugin {
 	}
 
 	/**
-	 * Ensures tomorrow's daily note exists, optionally rolling today's
-	 * unfinished tasks into it and opening it.
+	 * Ensures the daily note for `day` exists, optionally rolling the previous
+	 * note's unfinished tasks into it and opening it.
 	 */
-	private async planNextDay(options: {
-		open: boolean;
-		force?: boolean;
-	}): Promise<void> {
+	private async planDay(
+		day: PlannedDay,
+		options: { open: boolean; force?: boolean }
+	): Promise<void> {
 		if (!appHasDailyNotesPluginLoaded()) {
 			new Notice(
 				"Next Day Planner: enable the core Daily notes plugin first."
@@ -88,15 +97,17 @@ export default class NextDayPlannerPlugin extends Plugin {
 			return;
 		}
 
-		const date = moment().add(1, "day").startOf("day");
+		const date = moment()
+			.add(day === "tomorrow" ? 1 : 0, "day")
+			.startOf("day");
 
-		const note = await this.ensureDailyNote(date);
+		const note = await this.ensureDailyNote(date, day);
 		if (!note) {
 			return;
 		}
 
 		if (options.force || this.settings.rollOverOnOpen) {
-			await this.rollOverInto(note, date);
+			await this.rollOverInto(note, date, day, options.force ?? false);
 		}
 
 		if (options.open) {
@@ -107,7 +118,10 @@ export default class NextDayPlannerPlugin extends Plugin {
 	}
 
 	/** Returns the daily note for `date`, creating it from the template. */
-	private async ensureDailyNote(date: Moment): Promise<TFile | null> {
+	private async ensureDailyNote(
+		date: Moment,
+		day: PlannedDay
+	): Promise<TFile | null> {
 		const existing = this.findDailyNote(date);
 		if (existing) {
 			return existing;
@@ -117,7 +131,7 @@ export default class NextDayPlannerPlugin extends Plugin {
 			return await this.createDailyNote(date);
 		} catch (error) {
 			console.error("Next Day Planner: failed to create note", error);
-			new Notice("Next Day Planner: could not create tomorrow's note.");
+			new Notice(`Next Day Planner: could not create ${day}'s note.`);
 			return null;
 		}
 	}
@@ -230,46 +244,50 @@ export default class NextDayPlannerPlugin extends Plugin {
 	/**
 	 * Copies unchecked tasks from the last daily note before `date` into
 	 * `target`. The source note is never modified, and no earlier note means
-	 * nothing is rolled over.
+	 * nothing is rolled over. `reportEmpty` says so in a notice, for commands
+	 * whose only visible result would otherwise be that notice.
 	 */
-	private async rollOverInto(target: TFile, date: Moment): Promise<void> {
+	private async rollOverInto(
+		target: TFile,
+		date: Moment,
+		day: PlannedDay,
+		reportEmpty: boolean
+	): Promise<void> {
 		const source = this.findPreviousDailyNote(date);
-		if (!source || source.path === target.path) {
-			return;
-		}
-
 		const heading = this.settings.taskHeading;
-		const sourceLines = (await this.app.vault.cachedRead(source)).split(
-			"\n"
-		);
-		const tasks = extractUncheckedTasks(sourceLines, heading);
-		if (tasks.length === 0) {
-			return;
-		}
+		const tasks =
+			source && source.path !== target.path
+				? extractUncheckedTasks(
+						(await this.app.vault.cachedRead(source)).split("\n"),
+						heading
+					)
+				: [];
 
 		let added = 0;
 		let headingMissing = false;
 
-		await this.app.vault.process(target, (content) => {
-			const lines = content.split("\n");
-			if (!findSection(lines, heading)) {
-				headingMissing = true;
-				return content;
-			}
+		if (tasks.length > 0) {
+			await this.app.vault.process(target, (content) => {
+				const lines = content.split("\n");
+				if (!findSection(lines, heading)) {
+					headingMissing = true;
+					return content;
+				}
 
-			const result = insertTasks(
-				lines,
-				heading,
-				tasks,
-				this.settings.showRolloverCounter
-			);
-			added = result.added;
-			return added > 0 ? result.lines.join("\n") : content;
-		});
+				const result = insertTasks(
+					lines,
+					heading,
+					tasks,
+					this.settings.showRolloverCounter
+				);
+				added = result.added;
+				return added > 0 ? result.lines.join("\n") : content;
+			});
+		}
 
 		if (headingMissing) {
 			new Notice(
-				`Next Day Planner: no "${heading}" heading in tomorrow's note.`
+				`Next Day Planner: no "${heading}" heading in ${day}'s note.`
 			);
 			return;
 		}
@@ -277,6 +295,10 @@ export default class NextDayPlannerPlugin extends Plugin {
 		if (added > 0) {
 			new Notice(
 				`Next Day Planner: rolled over ${added} task${added === 1 ? "" : "s"}.`
+			);
+		} else if (reportEmpty) {
+			new Notice(
+				`Next Day Planner: nothing new to roll over into ${day}'s note.`
 			);
 		}
 	}
