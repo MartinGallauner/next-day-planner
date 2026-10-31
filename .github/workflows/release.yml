@@ -39,7 +39,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
+          awk -v tag="$tag" '
+            /^## \[/ { p = index($0, "## [" tag "]") == 1; next }
+            /^\[[^]]+\]: / { p = 0 }
+            p
+          ' CHANGELOG.md > release-notes.md
+          grep -q '[^[:space:]]' release-notes.md
           gh release create "$tag" \
             --title "$tag" \
             --draft \
+            --notes-file release-notes.md \
             main.js manifest.json
