@@ -14,24 +14,9 @@ For context: I enjoy planning my next day the night before.
 
 ## Install
 
-The plugin is not in the community directory yet, so it is installed through
-[BRAT](https://github.com/TfTHacker/obsidian42-brat), which fetches it from
-GitHub and keeps it updated.
-
-1. In Settings → Community plugins, install and enable **BRAT**.
-2. Open the command palette (`Ctrl/Cmd+P`) and run
-   **BRAT: Add a beta plugin for testing**.
-3. Paste `MartinGallauner/next-day-planner` and confirm.
-4. Go to Settings → Community plugins and turn on **Next Day Planner**. BRAT
-   installs the plugin but does not enable it.
-
-To update later, run **BRAT: Check for updates to all beta plugins and UPDATE**,
-or turn on automatic updates in BRAT's settings.
-
-Without BRAT: download `main.js` and `manifest.json` from the
-[latest release](https://github.com/MartinGallauner/next-day-planner/releases/latest),
-put them in `<your vault>/.obsidian/plugins/next-day-planner/`, restart
-Obsidian and enable the plugin.
+1. In Settings → Community plugins, select **Browse**.
+2. Search for **Next Day Planner** and select **Install**.
+3. Select **Enable**.
 
 ## Using it
 
