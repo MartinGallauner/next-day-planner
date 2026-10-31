@@ -1,6 +1,5 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { PluginSettingTab, SettingDefinitionItem } from "obsidian";
 import { appHasDailyNotesPluginLoaded } from "obsidian-daily-notes-interface";
-import type NextDayPlannerPlugin from "./main";
 
 export interface NextDayPlannerSettings {
 	/**
@@ -21,65 +20,32 @@ export const DEFAULT_SETTINGS: NextDayPlannerSettings = {
 };
 
 export class NextDayPlannerSettingTab extends PluginSettingTab {
-	constructor(
-		app: App,
-		private plugin: NextDayPlannerPlugin
-	) {
-		super(app, plugin);
-	}
-
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
-
-		if (!appHasDailyNotesPluginLoaded()) {
-			containerEl.createEl("p", {
-				cls: "mod-warning",
-				text: "The core Daily notes plugin is turned off, so this plugin does nothing until you enable it in Settings → Core plugins. Its folder, date format and template are used for tomorrow's note.",
-			});
-		}
-
-		new Setting(containerEl)
-			.setName("Roll over when opening tomorrow")
-			.setDesc(
-				"Carry unfinished tasks across as part of opening tomorrow's note. Tasks already there are never duplicated."
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.rollOverOnOpen)
-					.onChange(async (value) => {
-						this.plugin.settings.rollOverOnOpen = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Show rollover counter")
-			.setDesc(
-				"Mark carried tasks with (↻n) so a task you keep deferring becomes visible."
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.showRolloverCounter)
-					.onChange(async (value) => {
-						this.plugin.settings.showRolloverCounter = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Task heading")
-			.setDesc(
-				"Only roll over unchecked tasks under this heading, and put them under the same heading in tomorrow's note. Type the heading without the #, for example Tasks. Leave empty to use the whole note."
-			)
-			.addText((text) =>
-				text
-					.setPlaceholder("Whole note")
-					.setValue(this.plugin.settings.taskHeading)
-					.onChange(async (value) => {
-						this.plugin.settings.taskHeading = value.trim();
-						await this.plugin.saveSettings();
-					})
-			);
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				name: "Core Daily notes plugin is turned off",
+				desc: "This plugin does nothing until you enable it in Settings → Core plugins. Its folder, date format and template are used for tomorrow's note.",
+				visible: () => !appHasDailyNotesPluginLoaded(),
+			},
+			{
+				name: "Roll over when opening tomorrow",
+				desc: "Carry unfinished tasks across as part of opening tomorrow's note. Tasks already there are never duplicated.",
+				control: { type: "toggle", key: "rollOverOnOpen" },
+			},
+			{
+				name: "Show rollover counter",
+				desc: "Mark carried tasks with (↻n) so a task you keep deferring becomes visible.",
+				control: { type: "toggle", key: "showRolloverCounter" },
+			},
+			{
+				name: "Task heading",
+				desc: "Only roll over unchecked tasks under this heading, and put them under the same heading in tomorrow's note. Type the heading without the #, for example Tasks. Leave empty to use the whole note.",
+				control: {
+					type: "text",
+					key: "taskHeading",
+					placeholder: "Whole note",
+				},
+			},
+		];
 	}
 }

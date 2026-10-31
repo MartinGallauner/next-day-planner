@@ -9,7 +9,7 @@ For context: I enjoy planning my next day the night before.
 
 ## Requirements
 
-- Obsidian 1.5.0 or newer (desktop and mobile).
+- Obsidian 1.13.0 or newer (desktop and mobile).
 - The core **Daily notes** plugin turned on, in Settings → Core plugins.
 
 ## Install

@@ -74,7 +74,7 @@ export default class NextDayPlannerPlugin extends Plugin {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			await this.loadData()
+			(await this.loadData()) as Partial<NextDayPlannerSettings>
 		);
 	}
 
@@ -230,7 +230,7 @@ export default class NextDayPlannerPlugin extends Plugin {
 
 		let latest: { file: TFile; date: Moment } | null = null;
 		for (const file of notes) {
-			const noteDate = getDateFromFile(file, "day");
+			const noteDate = getDateFromFile(file, "day") as Moment | null;
 			if (
 				noteDate?.isBefore(date, "day") &&
 				(!latest || noteDate.isAfter(latest.date, "day"))

@@ -4,7 +4,7 @@ All notable changes to Next Day Planner are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 2026-10-31
 
 ### Added
 
@@ -13,8 +13,15 @@ All notable changes to Next Day Planner are documented here. The format follows
 
 ### Changed
 
+- Now requires Obsidian 1.13.0 or newer. Settings use its declarative API, so
+  they appear in Obsidian's settings search.
 - The roll-over commands now show a notice when there is nothing new to roll
   over, instead of doing nothing visibly.
+
+### Security
+
+- Release assets now carry GitHub artifact attestations, so their provenance can
+  be verified.
 
 ## [0.3.0] - 2026-10-25
 
@@ -79,6 +86,8 @@ Initial release.
 - Settings for the rollover heading, whether rollover happens on open, and
   whether the counter is shown.
 
+[0.4.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.4.0
+[0.3.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.3.0
 [0.2.1]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.2.1
 [0.2.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.2.0
 [0.1.0]: https://github.com/MartinGallauner/next-day-planner/releases/tag/0.1.0
